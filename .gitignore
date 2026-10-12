@@ -1,0 +1,33 @@
+# --- Secrets: NEVER commit these ---
+.env
+*.pem
+*.p8
+
+# --- Python ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# --- Data files (raw data belongs in the database, not git) ---
+data/*
+!data/samples/
+data/samples/*
+!data/samples/.gitkeep
+*.log
+
+# --- dbt ---
+dbt_project/target/
+dbt_project/dbt_packages/
+dbt_project/logs/
+
+# --- Streamlit local secrets ---
+.streamlit/secrets.toml
+
+# --- Editor / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

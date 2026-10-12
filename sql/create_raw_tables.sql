@@ -1,0 +1,1 @@
+-- create_raw_tables.sql - DDL for the raw layer tables (you design these in Phase 2)
