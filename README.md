@@ -33,7 +33,7 @@ flowchart LR
     SF -.-> DBT
     S --> DBT
     DBT --> APP[Streamlit dashboard<br/>cached, auto-refresh]
-    GH[GitHub Actions<br/>hourly cron] -. runs .-> B
+    GH[GitHub Actions<br/>hourly cron, self-hosted runner] -. runs .-> B
     GH -. runs .-> DBT
 ```
 
@@ -45,7 +45,7 @@ flowchart LR
 | Validation | `pandas`: type casting, null & range checks, timezone conversion, de-duplication |
 | Storage | **PostgreSQL** (Neon, serverless) and **Snowflake**, both accessed through **SQLAlchemy** |
 | Transformation | **dbt Core**: staging & analytics layers, incremental model, seeds, macros, generic + custom tests |
-| Orchestration | **GitHub Actions**: hourly cron, secrets management |
+| Orchestration | **GitHub Actions**: hourly cron on a self-hosted Windows runner, secrets management |
 | Visualisation | **Streamlit** + **Plotly**: map, KPIs, trends, heatmap |
 | Testing | `pytest` (17 unit tests, network mocked) + dbt data tests |
 
@@ -145,6 +145,8 @@ streamlit run dashboard/app.py    # dashboard
 ## Limitations & next steps
 
 - The data.gov.in API is sometimes slow or down (502s). Failed hours are skipped, and the next run continues.
+- The API refuses connections from GitHub's cloud runners, so the hourly job runs on a **self-hosted runner** (a PC in India). Hours when that PC is off are not collected. A small always-on machine in India (or a cloud VM in the Mumbai region) would fix this.
+- The source refreshes its dataset every hour, and rows can shift between pages if that happens mid-fetch. The scraper detects this (the reported total changes, or rows repeat) and re-fetches the snapshot.
 - Neon's free tier has limited storage. For long-term history, add a retention job for the raw layer (the incremental `fct_station_aqi` keeps the hourly history in a compact form).
 - Possible next steps: alerting when a city turns "Severe", forecasting next-day AQI, and adding weather data to explain pollution peaks.
 

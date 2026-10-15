@@ -1,10 +1,14 @@
 # hourly_pipeline.yml - every hour: unit tests -> scrape + clean + load -> dbt build (models + data tests)
 # Credentials come from GitHub Secrets (repo Settings -> Secrets and variables -> Actions).
+#
+# Runs on a SELF-HOSTED runner (a Windows PC in India), not on GitHub's cloud machines:
+# the data.gov.in API refuses connections from GitHub's cloud runners (ConnectTimeout on every
+# attempt, while the same API answers from an Indian connection at the same time).
 name: Hourly AQI pipeline
 
 on:
   schedule:
-    - cron: "17 * * * *"      # minute 17 of every hour (UTC). Avoids the busy :00 slot on GitHub's runners
+    - cron: "17 * * * *"      # minute 17 of every hour (UTC). If the PC is off, one run waits in the queue
   workflow_dispatch:          # adds a "Run workflow" button for manual runs
 
 concurrency:
@@ -13,9 +17,13 @@ concurrency:
 
 jobs:
   pipeline:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows]
     timeout-minutes: 30
+    defaults:
+      run:
+        shell: powershell
     env:
+      PYTHONUTF8: "1"         # Windows console: avoid encoding errors in logs
       DB_TYPE: postgres
       LOAD_TARGETS: ${{ vars.LOAD_TARGETS || 'postgres' }}   # set the repo variable to "postgres,snowflake" for dual-load
       DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
@@ -37,17 +45,18 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v5
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
-          cache: pip
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      # The virtual environment lives outside the checkout folder, so it survives between runs
+      # and packages are only downloaded once (later runs just confirm they are installed).
+      - name: Set up Python environment
+        run: |
+          $venv = Join-Path $HOME ".venvs\aqi-pipeline"
+          if (-not (Test-Path "$venv\Scripts\python.exe")) { python -m venv $venv }
+          & "$venv\Scripts\python.exe" -m pip install --quiet --disable-pip-version-check -r requirements.txt
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          [IO.File]::AppendAllText($env:GITHUB_PATH, "$venv\Scripts`n")
 
       - name: Unit tests
-        run: pytest -q
+        run: python -m pytest -q
 
       - name: Extract + load (scrape -> clean -> load)
         run: python -m scraper.pipeline
