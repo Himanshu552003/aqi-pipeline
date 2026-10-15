@@ -1,12 +1,13 @@
 # 🌫️ India Air Quality: Live Data Pipeline & Dashboard
 
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://india-aqi-live.streamlit.app/)
 [![Hourly AQI pipeline](https://github.com/Himanshu552003/aqi-pipeline/actions/workflows/hourly_pipeline.yml/badge.svg)](https://github.com/Himanshu552003/aqi-pipeline/actions/workflows/hourly_pipeline.yml)
 
 An end-to-end data engineering + analytics project. Every hour it collects real-time air quality
 readings from **~500 government monitoring stations across India**, loads them into a cloud data
 warehouse, models them with **dbt**, and serves a **live Streamlit dashboard**.
 
-**▶ Live dashboard:** _add your Streamlit Cloud link here_
+**▶ Live dashboard: [india-aqi-live.streamlit.app](https://india-aqi-live.streamlit.app/)**
 
 ---
 
@@ -114,7 +115,7 @@ pollution hour, and the share of hours with "Poor" or worse air._
 
 ## Run it yourself
 
-To run it locally (Python 3.11, a free data.gov.in API key and a PostgreSQL database):
+Just want to see it? Open the **[live dashboard](https://india-aqi-live.streamlit.app/)**. To run it locally (Python 3.11, a free data.gov.in API key and a PostgreSQL database):
 
 ```bash
 pip install -r requirements.txt
