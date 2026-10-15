@@ -49,5 +49,6 @@ select
 
 from deduplicated as d
 left join aliases as a
-    on d.city = a.alias
+    on  d.city = a.alias
+    and (a.state is null or a.state = d.state)   -- state-specific aliases (e.g. Aurangabad exists in 2 states)
 where d.row_num = 1

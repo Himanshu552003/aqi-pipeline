@@ -23,4 +23,5 @@ select
 
 from population as p
 left join aliases as a
-    on p.city = a.alias
+    on  p.city = a.alias
+    and (a.state is null or a.state = p.state)

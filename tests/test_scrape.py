@@ -40,6 +40,30 @@ def test_fetch_all_follows_pagination(monkeypatch):
     assert offsets_called == [0, 2]        # offset moves by the rows actually received
 
 
+def test_exact_duplicates_are_removed():
+    records = [{"id": 1}, {"id": 2}, {"id": 1}]
+    assert scrape.drop_exact_duplicates(records) == [{"id": 1}, {"id": 2}]
+
+
+def test_inconsistent_snapshot_is_fetched_again(monkeypatch):
+    # 1st snapshot: the source refreshed mid-fetch, so page 2 repeats a row and row 3 is missed.
+    # 2nd snapshot: clean.
+    snapshots = iter([
+        {0: [{"id": 1}, {"id": 2}], 2: [{"id": 2}]},
+        {0: [{"id": 1}, {"id": 2}], 2: [{"id": 3}]},
+    ])
+    current = {}
+
+    def fake_get(url, params, headers, timeout):
+        if params["offset"] == 0:
+            current.update(next(snapshots))
+        return FakeResponse(200, {"total": "3", "records": current[params["offset"]]})
+
+    monkeypatch.setattr(scrape.requests, "get", fake_get)
+    records = scrape.fetch_all()
+    assert [r["id"] for r in records] == [1, 2, 3]
+
+
 def test_fetch_page_retries_server_errors(monkeypatch):
     responses = iter([FakeResponse(502), FakeResponse(503), FakeResponse(200, {"records": []})])
     monkeypatch.setattr(scrape.requests, "get", lambda *a, **k: next(responses))

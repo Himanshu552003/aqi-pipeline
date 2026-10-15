@@ -17,6 +17,8 @@ seeds:
       so CPCB station cities and Wikipedia population rows join correctly.
     columns:
       - name: alias
-        data_tests: [unique, not_null]
+        data_tests: [not_null]
+      - name: state
+        description: Empty = applies in every state; filled = only in that state (Aurangabad exists in two).
       - name: standard_name
         data_tests: [not_null]

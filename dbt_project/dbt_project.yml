@@ -21,6 +21,9 @@ models:
 seeds:
   aqi_pipeline:
     +schema: raw                # reference data lives next to the other raw inputs
+    city_name_aliases:
+      +column_types:
+        state: varchar(100)
     city_population:
       +column_types:
         population_2011: bigint

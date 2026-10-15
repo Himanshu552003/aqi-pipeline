@@ -1,19 +1,30 @@
-alias,standard_name
-Gurgaon,Gurugram
-Mysore,Mysuru
-Mangalore,Mangaluru
-Belgaum,Belagavi
-Gulbarga,Kalaburagi
-Hubli,Hubballi
-Hubli–Dharwad,Hubballi
-Bangalore,Bengaluru
-Calcutta,Kolkata
-Bombay,Mumbai
-Madras,Chennai
-Allahabad,Prayagraj
-Trivandrum,Thiruvananthapuram
-Cochin,Kochi
-Pondicherry,Puducherry
-Baroda,Vadodara
-Vizag,Visakhapatnam
-New Delhi,Delhi
+alias,state,standard_name
+Gurgaon,,Gurugram
+Mysore,,Mysuru
+Mangalore,,Mangaluru
+Belgaum,,Belagavi
+Gulbarga,,Kalaburagi
+Hubli,,Hubballi
+Hubli–Dharwad,,Hubballi
+Dharwad,Karnataka,Hubballi
+Bangalore,,Bengaluru
+Calcutta,,Kolkata
+Bombay,,Mumbai
+Madras,,Chennai
+Allahabad,,Prayagraj
+Trivandrum,,Thiruvananthapuram
+Cochin,,Kochi
+Pondicherry,,Puducherry
+Baroda,,Vadodara
+Vizag,,Visakhapatnam
+New Delhi,,Delhi
+Aurangabad,Maharashtra,Chhatrapati Sambhajinagar
+Chhapra,Bihar,Chapra
+Kalyan,Maharashtra,Kalyan-Dombivli
+Dombivli,Maharashtra,Kalyan-Dombivli
+Gadag,Karnataka,Gadag-Betageri
+Mehsana,Gujarat,Mahesana
+Nanded,Maharashtra,Nanded Waghala
+Sangli,Maharashtra,Sangli-Miraj & Kupwad
+Virar,Maharashtra,Vasai-Virar
+Yamuna Nagar,Haryana,Yamunanagar
