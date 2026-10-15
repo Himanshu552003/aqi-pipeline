@@ -213,10 +213,14 @@ def dashboard() -> None:
         ranking_chart(data["ranking"])
 
     st.divider()
-    worst_first = data["ranking"].sort_values("most_polluted_rank")["city"].drop_duplicates().tolist()
+    # Options = every city with hourly history. The default must be a subset of the options,
+    # so pick the most polluted cities (24 h ranking) that are actually in that list.
+    city_options = sorted(data["hourly"]["city"].unique())
+    worst_first = data["ranking"].sort_values("most_polluted_rank")["city"].drop_duplicates()
+    default_cities = [city for city in worst_first if city in city_options][:3]
     cities = st.multiselect(
-        f"Compare cities (up to {MAX_TREND_CITIES})", options=sorted(latest["city"].unique()),
-        default=worst_first[:3], max_selections=MAX_TREND_CITIES,
+        f"Compare cities (up to {MAX_TREND_CITIES})", options=city_options,
+        default=default_cities, max_selections=MAX_TREND_CITIES,
     )
     if not cities:
         st.info("Pick at least one city.")
