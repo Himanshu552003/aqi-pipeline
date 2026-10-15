@@ -32,3 +32,8 @@ dbt_project/.user.yml
 .idea/
 .DS_Store
 Thumbs.db
+
+# --- Personal notes (kept locally, not published) ---
+CLAUDE.md
+PROGRESS.md
+INSTRUCTIONS.md

@@ -114,7 +114,7 @@ pollution hour, and the share of hours with "Poor" or worse air._
 
 ## Run it yourself
 
-See **[INSTRUCTIONS.md](INSTRUCTIONS.md)** for the full setup: local run, GitHub Actions, Streamlit deploy, Snowflake.
+To run it locally (Python 3.11, a free data.gov.in API key and a PostgreSQL database):
 
 ```bash
 pip install -r requirements.txt
