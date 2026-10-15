@@ -1,0 +1,63 @@
+# hourly_pipeline.yml - every hour: unit tests -> scrape + clean + load -> dbt build (models + data tests)
+# Credentials come from GitHub Secrets (repo Settings -> Secrets and variables -> Actions).
+name: Hourly AQI pipeline
+
+on:
+  schedule:
+    - cron: "17 * * * *"      # minute 17 of every hour (UTC). Avoids the busy :00 slot on GitHub's runners
+  workflow_dispatch:          # adds a "Run workflow" button for manual runs
+
+concurrency:
+  group: aqi-pipeline         # never run two pipelines at the same time
+  cancel-in-progress: false
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DB_TYPE: postgres
+      LOAD_TARGETS: ${{ vars.LOAD_TARGETS || 'postgres' }}   # set the repo variable to "postgres,snowflake" for dual-load
+      DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
+      POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+      POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_SSLMODE: require
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+      SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+      SNOWFLAKE_SCHEMA: RAW
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Unit tests
+        run: pytest -q
+
+      - name: Extract + load (scrape -> clean -> load)
+        run: python -m scraper.pipeline
+
+      - name: Transform + test with dbt (Postgres)
+        run: python run_dbt.py build --target postgres
+
+      - name: Transform + test with dbt (Snowflake)
+        if: contains(env.LOAD_TARGETS, 'snowflake')
+        run: python run_dbt.py build --target snowflake
+
+      - name: Check source freshness
+        run: python run_dbt.py source freshness --target postgres

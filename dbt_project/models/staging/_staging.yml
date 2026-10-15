@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: stg_aqi_readings
+    description: Cleaned CPCB pollutant sub-indices. Grain = station x pollutant x reading time.
+    columns:
+      - name: reading_id
+        description: Hash of station + pollutant + reading time (the natural key).
+        data_tests: [unique, not_null]
+      - name: station_name
+        data_tests: [not_null]
+      - name: city
+        data_tests: [not_null]
+      - name: pollutant_id
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['PM2.5', 'PM10', 'NO2', 'SO2', 'CO', 'OZONE', 'NH3']
+      - name: reading_time_utc
+        data_tests: [not_null]
+      - name: avg_sub_index
+        description: Average sub-index of this pollutant over the last 24 hours (CPCB scale 0-500).
+        data_tests:
+          - not_null
+          - value_between:
+              arguments:
+                min_value: 0
+                max_value: 500
+
+  - name: stg_city_population
+    description: City populations (Census 2011) with standardised names.
+    columns:
+      - name: city
+        data_tests: [not_null]

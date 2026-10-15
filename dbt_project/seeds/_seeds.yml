@@ -1,0 +1,22 @@
+version: 2
+
+seeds:
+  - name: city_population
+    description: >
+      Indian cities with population (Census 2011 and 2001) and coordinates, scraped from Wikipedia
+      "List of cities in India by population" by scraper/scrape_population.py (CC BY-SA 4.0).
+    columns:
+      - name: city
+        data_tests: [not_null]
+      - name: population_2011
+        data_tests: [not_null]
+
+  - name: city_name_aliases
+    description: >
+      Maps old / alternate city spellings (Gurgaon, Mysore, Bangalore...) to one standard name,
+      so CPCB station cities and Wikipedia population rows join correctly.
+    columns:
+      - name: alias
+        data_tests: [unique, not_null]
+      - name: standard_name
+        data_tests: [not_null]

@@ -1,0 +1,81 @@
+version: 2
+
+models:
+  - name: fct_station_aqi
+    description: >
+      AQI per station per reading time. AQI = highest pollutant sub-index; valid only with
+      3+ pollutants including PM2.5 or PM10 (CPCB rule). Incremental model.
+    columns:
+      - name: station_reading_id
+        data_tests: [unique, not_null]
+      - name: aqi
+        data_tests:
+          - not_null
+          - value_between:
+              arguments:
+                min_value: 0
+                max_value: 500
+      - name: aqi_category
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Good', 'Satisfactory', 'Moderate', 'Poor', 'Very Poor', 'Severe']
+      - name: dominant_pollutant
+        data_tests: [not_null]
+
+  - name: fct_city_aqi_hourly
+    description: Average AQI per city per IST hour (valid station AQIs only).
+    columns:
+      - name: city_hour_id
+        data_tests: [unique, not_null]
+      - name: avg_aqi
+        data_tests:
+          - not_null
+          - value_between:
+              arguments:
+                min_value: 0
+                max_value: 500
+
+  - name: fct_city_aqi_daily
+    description: Daily AQI summary per city (IST calendar day).
+    columns:
+      - name: city_day_id
+        data_tests: [unique, not_null]
+
+  - name: city_latest_aqi
+    description: Current AQI per city from each station's latest valid reading (max 3 hours old).
+    columns:
+      - name: city
+        data_tests: [not_null]
+      - name: avg_aqi
+        data_tests: [not_null]
+      - name: aqi_category
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Good', 'Satisfactory', 'Moderate', 'Poor', 'Very Poor', 'Severe']
+
+  - name: city_ranking_24h
+    description: Cities ranked by average AQI over the last 24 hours of data (1 = most polluted).
+    columns:
+      - name: most_polluted_rank
+        data_tests: [not_null]
+
+  - name: city_hour_of_day_profile
+    description: Typical AQI by hour of day (IST) per city; is_peak_hour marks the worst hour.
+    columns:
+      - name: hour_of_day
+        data_tests:
+          - value_between:
+              arguments:
+                min_value: 0
+                max_value: 23
+
+  - name: aqi_category_distribution
+    description: Share of station-hours in each AQI category, per city.
+    columns:
+      - name: aqi_category
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Good', 'Satisfactory', 'Moderate', 'Poor', 'Very Poor', 'Severe']

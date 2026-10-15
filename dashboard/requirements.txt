@@ -1,0 +1,10 @@
+# Dashboard-only dependencies. Streamlit Community Cloud uses THIS file (it sits next to app.py),
+# so the deployed app does not install dbt and the scraper stack.
+streamlit==1.66.0
+plotly==7.1.0
+pandas==3.0.6
+SQLAlchemy==2.0.54
+psycopg2-binary==2.9.13
+python-dotenv==1.2.4
+# Uncomment when the dashboard reads from Snowflake (DB_TYPE=snowflake):
+# snowflake-sqlalchemy==1.11.1

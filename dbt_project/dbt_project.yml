@@ -1,0 +1,29 @@
+# dbt_project.yml - dbt project config: where models live and how each layer is built
+name: aqi_pipeline
+version: "1.0.0"
+profile: aqi_pipeline
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  aqi_pipeline:
+    staging:
+      +schema: staging          # cleaned, renamed, de-duplicated views over raw
+      +materialized: view
+    analytics:
+      +schema: analytics        # business-ready tables for the dashboard
+      +materialized: table
+
+seeds:
+  aqi_pipeline:
+    +schema: raw                # reference data lives next to the other raw inputs
+    city_population:
+      +column_types:
+        population_2011: bigint
+        population_2001: bigint
+        latitude: float
+        longitude: float
